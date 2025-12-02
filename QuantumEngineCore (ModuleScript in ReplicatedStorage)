@@ -1,0 +1,78 @@
+local RunService = game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
+local SoundService = game:GetService("SoundService")
+
+local final_Task = task
+local final_Tick = tick
+
+local QuantumEngineCore = {}
+QuantumEngineCore.__index = QuantumEngineCore
+QuantumEngineCore.Modules = {}
+QuantumEngineCore.IsInitialized = { Client = false, Server = false }
+QuantumEngineCore.Performance = {
+	FrameTime = 0,
+	SchedulerBudget = 0.001
+}
+
+local _clientScheduler = {}
+local _serverScheduler = {}
+
+function QuantumEngineCore.Init(context: "Client" | "Server")
+	if self.IsInitialized[context] then
+		return
+	end
+	
+	local startTime = final_Tick()
+
+	if context == "Client" then
+		self.Modules.RenderManager = require(script.RenderManager)
+		self.Modules.AudioManager = require(script.AudioManager)
+		self.Modules.UIManager = require(script.UIManager)
+		
+		self.Modules.RenderManager:Init()
+		self.Modules.AudioManager:Init()
+		self.Modules.UIManager:Init()
+		
+		RunService.RenderStepped:Connect(function(deltaTime)
+			self:_UpdateScheduler(_clientScheduler, deltaTime)
+			self.Performance.FrameTime = deltaTime
+		end)
+		
+	elseif context == "Server" then
+		self.Modules.NetworkManager = require(script.NetworkManager)
+		self.Modules.PhysicsManager = require(script.PhysicsManager)
+		
+		self.Modules.NetworkManager:Init()
+		self.Modules.PhysicsManager:Init()
+		
+		RunService.Heartbeat:Connect(function(deltaTime)
+			self:_UpdateScheduler(_serverScheduler, deltaTime)
+		end)
+	end
+	
+	self.IsInitialized[context] = true
+	local initTime = (final_Tick() - startTime) * 1000
+end
+
+function QuantumEngineCore.ScheduleTask(context: "Client" | "Server", func: () -> ())
+	if context == "Client" then
+		table.insert(_clientScheduler, func)
+	else
+		table.insert(_serverScheduler, func)
+	end
+end
+
+function QuantumEngineCore:_UpdateScheduler(scheduler: {}, deltaTime: number)
+	local startTime = final_Tick()
+	
+	for i = #scheduler, 1, -1 do
+		scheduler[i](deltaTime)
+		table.remove(scheduler, i)
+		
+		if (final_Tick() - startTime) > self.Performance.SchedulerBudget then
+			break
+		end
+	end
+end
+
+return QuantumEngineCore
