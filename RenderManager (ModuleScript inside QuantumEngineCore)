@@ -1,0 +1,39 @@
+local Lighting = game:GetService("Lighting")
+local RenderManager = {}
+
+function RenderManager:Init()
+	Lighting.Technology = Enum.Technology.Future
+	Lighting.ShadowSoftness = 0.1
+	Lighting.GlobalShadows = true
+	Lighting.Ambient = Color3.fromRGB(20, 20, 30)
+	Lighting.OutdoorAmbient = Color3.fromRGB(120, 120, 130)
+	
+	local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere") or Instance.new("Atmosphere")
+	atmosphere.Parent = Lighting
+	atmosphere.Haze = 1.0
+	atmosphere.Density = 0.3
+	atmosphere.Color = Color3.fromRGB(170, 170, 190)
+
+	local cc = Lighting:FindFirstChildOfClass("ColorCorrection") or Instance.new("ColorCorrection")
+	cc.Parent = Lighting
+	cc.TintColor = Color3.fromRGB(255, 245, 230)
+	cc.Contrast = 0.1
+	cc.Saturation = 0.05
+	
+	local bloom = Lighting:FindFirstChildOfClass("Bloom") or Instance.new("Bloom")
+	bloom.Parent = Lighting
+	bloom.Intensity = 0.15
+	bloom.Size = 80
+	bloom.Threshold = 0.8
+	
+	local sunRays = Lighting:FindFirstChildOfClass("SunRays") or Instance.new("SunRays")
+	sunRays.Parent = Lighting
+	sunRays.Intensity = 0.1
+	sunRays.Spread = 0.2
+	
+	game:GetService("Workspace").StreamingEnabled = true
+	game:GetService("Workspace").StreamingMinRadius = 64
+	game:GetService("Workspace").StreamingTargetRadius = 1024
+end
+
+return RenderManager
