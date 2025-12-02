@@ -1,0 +1,19 @@
+local GuiService = game:GetService("GuiService")
+local UserInputService = game:GetService("UserInputService")
+local UIManager = {}
+
+function UIManager:Init()
+	for _, gui in ipairs(game:GetService("Players").LocalPlayer.PlayerGui:GetChildren()) do
+		if gui:IsA("ScreenGui") then
+			gui.IgnoreGuiInset = true
+			gui.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
+		end
+	end
+
+	UserInputService.InputBegan:Connect(function(input, gameProcessed)
+		if gameProcessed then return end
+		
+	end)
+end
+
+return UIManager
