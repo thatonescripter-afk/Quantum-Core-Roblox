@@ -1,3 +1,4 @@
+{feel free to use this or modify it}
 Quantum Core Framework
 A framework for Roblox Luau to manage common game systems.
 
