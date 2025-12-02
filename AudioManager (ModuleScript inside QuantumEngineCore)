@@ -1,0 +1,26 @@
+local SoundService = game:GetService("SoundService")
+local AudioManager = {}
+
+function AudioManager:Init()
+	local masterGroup = SoundService:FindFirstChild("MasterSoundGroup") or Instance.new("SoundGroup")
+	masterGroup.Name = "MasterSoundGroup"
+	masterGroup.Parent = SoundService
+	masterGroup.Volume = 1.0
+	
+	local reverb = masterGroup:FindFirstChildOfClass("ReverbSoundEffect") or Instance.new("ReverbSoundEffect")
+	reverb.Parent = masterGroup
+	reverb.DecayTime = 1.5
+	reverb.Density = 0.8
+	reverb.Diffusion = 0.7
+	reverb.DryLevel = -3
+	reverb.WetLevel = -8
+	
+	local compressor = masterGroup:FindFirstChildOfClass("CompressorSoundEffect") or Instance.new("CompressorSoundEffect")
+	compressor.Parent = masterGroup
+	compressor.Threshold = -20
+	compressor.Ratio = 4
+	compressor.Attack = 0.01
+	compressor.Release = 0.1
+end
+
+return AudioManager
